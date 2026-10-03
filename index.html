@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Penilaian Juri</title>
+<style>
+:root{
+  --navy:#1e3c72; --navy2:#2a5298; --gold:#ffd700; --gold2:#ffed4e;
+  --bg1:#f5f7fa; --bg2:#c3cfe2; --line:#e2e8f0; --muted:#64748b;
+  --ok:#10b981; --warn:#f59e0b; --bad:#ef4444;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);color:#1f2937}
+.hide{display:none !important}
+
+/* ---------- umum ---------- */
+.btn{padding:.7rem 1.3rem;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:.2s;font-family:inherit}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-p{background:linear-gradient(135deg,var(--gold) 0%,var(--gold2) 100%);color:var(--navy)}
+.btn-p:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 12px rgba(255,215,0,.3)}
+.btn-s{background:#64748b;color:#fff}
+.btn-s:hover:not(:disabled){background:#475569}
+.btn-d{background:var(--bad);color:#fff}
+.btn-d:hover:not(:disabled){background:#dc2626}
+.btn-o{background:#fff;color:var(--navy);border:2px solid var(--navy)}
+.btn-o:hover:not(:disabled){background:#f1f5f9}
+.btn-sm{padding:.35rem .75rem;font-size:.8rem}
+.card{background:#fff;border-radius:12px;border:1px solid var(--line);box-shadow:0 4px 6px rgba(0,0,0,.05);padding:1.5rem;margin-bottom:1.25rem}
+h3.sec{margin:0 0 1rem;color:var(--navy);font-size:1.15rem}
+label.f{display:block;font-weight:600;color:var(--navy);margin-bottom:.4rem;font-size:.9rem}
+input.f,select.f,textarea.f{width:100%;padding:.75rem;border:2px solid var(--line);border-radius:8px;font-size:1rem;font-family:inherit}
+input.f:focus,select.f:focus,textarea.f:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,.12)}
+.row{display:grid;gap:1rem;margin-bottom:1rem}
+.row.c2{grid-template-columns:1fr 1fr}
+.row.c3{grid-template-columns:1fr 1fr 1fr}
+.row.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:700px){.row.c2,.row.c3,.row.c4{grid-template-columns:1fr}}
+table.t{width:100%;border-collapse:collapse;background:#fff;font-size:.9rem}
+table.t th,table.t td{padding:.6rem .7rem;text-align:left;border-bottom:1px solid var(--line)}
+table.t th{background:#f8fafc;color:var(--navy);font-weight:700;position:sticky;top:0;z-index:2}
+table.t tr:hover td{background:#fafbfc}
+.scroll{overflow:auto;max-height:65vh;border:1px solid var(--line);border-radius:8px}
+.pill{display:inline-block;padding:.15rem .55rem;border-radius:20px;font-size:.72rem;font-weight:700}
+.pill.ok{background:#d1fae5;color:#065f46}
+.pill.warn{background:#fef3c7;color:#92400e}
+.pill.bad{background:#fee2e2;color:#991b1b}
+.pill.info{background:#dbeafe;color:#1e40af}
+.muted{color:var(--muted);font-size:.85rem}
+.nowrap{white-space:nowrap}
+.center{text-align:center}
+.right{text-align:right}
+
+/* ---------- login ---------- */
+#view-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem}
+.login-card{background:#fff;border-radius:16px;padding:2.5rem;box-shadow:0 10px 25px rgba(0,0,0,.1);width:100%;max-width:440px}
+.logos{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1.25rem;min-height:10px}
+.logos img{height:72px;width:auto;object-fit:contain}
+.login-card h1{font-size:1.5rem;color:var(--navy);margin:0 0 .35rem;text-align:center}
+.login-card p.sub{color:var(--muted);text-align:center;margin:0 0 1.75rem;font-size:.92rem}
+.alert{padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.9rem;line-height:1.45}
+.alert.e{background:#fee2e2;color:#b91c1c}
+.alert.s{background:#d1fae5;color:#065f46}
+.alert.i{background:#dbeafe;color:#1e40af}
+.wm{text-align:center;color:var(--muted);font-size:.75rem;padding:1.25rem 0}
+
+/* ---------- shell ---------- */
+header.top{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:1rem 1.5rem;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.top-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.top-l{display:flex;align-items:center;gap:.9rem}
+.top-l img{height:46px;width:auto;object-fit:contain}
+.top-l h1{margin:0;font-size:1.15rem;line-height:1.3}
+.top-l .ev{font-size:.82rem;opacity:.85}
+.top-r{display:flex;align-items:center;gap:.8rem;font-size:.88rem}
+.badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);padding:.2rem .6rem;border-radius:20px;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+.tabs{max-width:1280px;margin:0 auto;padding:1rem 1.5rem 0;display:flex;gap:.5rem;flex-wrap:wrap}
+.tab{padding:.6rem 1.1rem;border:2px solid var(--navy);background:#fff;color:var(--navy);border-radius:8px;cursor:pointer;font-weight:600;font-size:.88rem;font-family:inherit}
+.tab.on{background:var(--navy);color:#fff}
+.wrap{max-width:1280px;margin:0 auto;padding:1.25rem 1.5rem 3rem}
+.subtabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.stab{padding:.45rem .9rem;border:2px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;font-size:.85rem;font-family:inherit;font-weight:600;color:#475569}
+.stab.on{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+
+/* ---------- juri ---------- */
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.85rem}
+.pcard{background:#fff;border:2px solid var(--line);border-radius:10px;padding:1rem;cursor:pointer;transition:.2s}
+.pcard:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,.07)}
+.pcard.done{border-color:var(--ok);background:#f0fdf4}
+.pcard .no{font-weight:700;color:var(--navy);font-size:.95rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.pcard .nm{font-weight:600;margin:.35rem 0 .2rem;font-size:.95rem}
+.pcard .tj{color:var(--muted);font-size:.82rem;line-height:1.35}
+.prog-bar{width:100%;height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:.5rem}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;transition:width .3s}
+.ang-sec{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:1rem;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,.05)}
+.ang-head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:1rem 1.25rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:.75rem}
+.ang-head .t{font-weight:600;font-size:1.02rem}
+.ang-sc{background:var(--gold);color:var(--navy);padding:.3rem .8rem;border-radius:20px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.ang-body{padding:1.25rem;display:none}
+.ang-body.on{display:block}
+.krit{padding-bottom:1.1rem;margin-bottom:1.1rem;border-bottom:1px solid #f1f5f9}
+.krit:last-child{border:none;margin:0;padding:0}
+.krit-t{font-weight:500;color:#334155;margin-bottom:.1rem;line-height:1.45}
+.krit-h{color:var(--muted);font-size:.8rem;margin-bottom:.6rem;font-style:italic}
+.sbtns{display:grid;gap:.4rem;grid-template-columns:repeat(10,1fr)}
+@media(max-width:700px){.sbtns{grid-template-columns:repeat(5,1fr)}}
+.sbtn{padding:.6rem .3rem;border:2px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:.88rem;font-family:inherit;transition:.15s}
+.sbtn:hover{border-color:var(--gold);background:#fffbeb}
+.sbtn.on{background:linear-gradient(135deg,var(--gold),var(--gold2));border-color:var(--gold);color:var(--navy);box-shadow:0 3px 7px rgba(255,215,0,.3)}
+.slab{display:flex;justify-content:space-between;margin-top:.4rem;font-size:.73rem;color:var(--muted)}
+.total-box{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:12px;padding:1.5rem;text-align:center;margin:1.25rem 0}
+.total-box .n{font-size:2.6rem;font-weight:700;line-height:1}
+.total-box .l{opacity:.9;margin-top:.3rem;font-size:.95rem}
+.sticky-act{position:sticky;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:.9rem;display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin:0 -1.5rem -3rem;backdrop-filter:blur(4px)}
+
+/* ---------- modal ---------- */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;padding:1rem}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:12px;padding:1.75rem;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 10px 25px rgba(0,0,0,.2)}
+.mbox h3{margin:0 0 1rem;color:var(--navy)}
+.mico{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:#fff;font-size:1.5rem;font-weight:700}
+.mact{display:flex;gap:.7rem;justify-content:center;margin-top:1.25rem;flex-wrap:wrap}
+#toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:.8rem 1.4rem;border-radius:8px;z-index:3000;display:none;max-width:90vw;font-size:.9rem;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+#spin{position:fixed;inset:0;background:rgba(255,255,255,.65);z-index:2500;display:none;align-items:center;justify-content:center}
+#spin.on{display:flex}
+.sp{width:44px;height:44px;border:4px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- cetak ---------- */
+@media print{
+  header.top,.tabs,.subtabs,.sticky-act,.btn,#toast,#spin{display:none !important}
+  body{background:#fff}
+  .wrap{padding:0;max-width:none}
+  .card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid}
+  table.t{font-size:.72rem}
+  table.t th{background:#eee !important;color:#000 !important}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================== SETUP URL =========================== -->
+<div id="view-setup" class="hide" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem">
+  <div class="login-card">
+    <h1>Sambung ke Backend</h1>
+    <p class="sub">Tampal URL Web App Apps Script (yang berakhir dengan <b>/exec</b>)</p>
+    <div id="setup-err" class="alert e hide"></div>
+    <div style="margin-bottom:1rem">
+      <label class="f" for="setup-url">URL Web App</label>
+      <input class="f" id="setup-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <button class="btn btn-p" style="width:100%" onclick="simpanUrl()">Sambung</button>
+    <p class="muted" style="margin-top:1rem;line-height:1.5">
+      URL ini disimpan dalam browser ini sahaja. Untuk sistem yang digunakan oleh juri,
+      tampal URL terus ke dalam pemalar <b>API_URL</b> di bahagian atas fail index.html.
+    </p>
+  </div>
+</div>
+
+<!-- =========================== LOGIN =========================== -->
+<div id="view-login" class="hide">
+  <div>
+    <div class="login-card">
+      <div class="logos" id="login-logos"></div>
+      <h1 id="login-title">Sistem Penilaian Juri</h1>
+      <p class="sub" id="login-sub">Sila log masuk untuk meneruskan</p>
+      <div id="login-err" class="alert e hide"></div>
+      <form id="login-form" autocomplete="on">
+        <div style="margin-bottom:1rem">
+          <label class="f" for="in-id">ID Pengguna</label>
+          <input class="f" id="in-id" autocomplete="username" required>
+        </div>
+        <div style="margin-bottom:1.4rem">
+          <label class="f" for="in-kod">Kod Akses</label>
+          <input class="f" id="in-kod" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-p" style="width:100%" id="login-btn" type="submit">Log Masuk</button>
+      </form>
+    </div>
+    <div class="wm" id="login-wm"></div>
+  </div>
+</div>
+
+<!-- =========================== APP =========================== -->
+<div id="view-app" class="hide">
+  <header class="top">
+    <div class="top-in">
+      <div class="top-l">
+        <span id="top-logos"></span>
+        <div>
+          <h1 id="top-title">Sistem Penilaian Juri</h1>
+          <div class="ev" id="top-ev"></div>
+        </div>
+      </div>
+      <div class="top-r">
+        <span class="badge" id="top-role"></span>
+        <span id="top-nama"></span>
+        <button class="btn btn-sm btn-s" onclick="logout()">Log Keluar</button>
+      </div>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <main class="wrap" id="panes"></main>
+  <div class="wm" id="app-wm"></div>
+</div>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<div id="spin"><div class="sp"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ===========================================================================
+   KONFIGURASI — tampal URL Web App Apps Script di sini
+   =========================================================================== */
+var API_URL = 'https://script.google.com/macros/s/AKfycbzYyTuDMyZZV44_5-FwloyS_1MZJCBVZTOZDq1qJuft7wSqr8TBKt3vjxwcXiLOh4HU/exec';
+
+/* =========================================================================== */
+var S = { token:null, nama:null, role:null, userId:null };
+var ST = {};            // state semasa
+var $ = function(id){ return document.getElementById(id); };
+
+function url(){
+  if (API_URL.indexOf('script.google.com') >= 0) return API_URL;
+  return localStorage.getItem('juri_api_url') || '';
+}
+
+/* ---------- panggilan API ---------- */
+function api(action, data, senyap){
+  if (!senyap) spin(true);
+  return fetch(url(), {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:action, token:S.token, data:data||{} })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if (!senyap) spin(false);
+    if (j.status !== 'success'){
+      if (j.message === 'SESSION_EXPIRED'){
+        bersihSesi();
+        tunjuk('login');
+        ralatLogin('Sesi anda telah tamat tempoh. Sila log masuk semula.');
+        throw new Error('SESSION_EXPIRED');
+      }
+      throw new Error(j.message || 'Ralat tidak diketahui.');
+    }
+    return j.data;
+  }).catch(function(e){
+    if (!senyap) spin(false);
+    if (e.message === 'SESSION_EXPIRED') throw e;
+    if (e instanceof TypeError) throw new Error('Tidak dapat sambung ke server. Semak sambungan internet atau URL Web App.');
+    throw e;
+  });
+}
+
+function spin(on){ $('spin').classList.toggle('on', !!on); }
+var toastT;
+function toast(msg){
+  var t = $('toast'); t.textContent = msg; t.style.display='block';
+  clearTimeout(toastT); toastT = setTimeout(function(){ t.style.display='none'; }, 3600);
+}
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+function tunjuk(v){
+  ['setup','login','app'].forEach(function(x){ $('view-'+x).classList.toggle('hide', x!==v); });
+}
+function bersihSesi(){
+  S = { token:null, nama:null, role:null, userId:null };
+  localStorage.removeItem('juri_token');
+}
+
+/* ---------- modal ---------- */
+function modal(html){ $('mbox').innerHTML = html; $('modal').classList.add('on'); }
+function tutupModal(){ $('modal').classList.remove('on'); }
+$('modal').addEventListener('click', function(e){ if (e.target === this) tutupModal(); });
+
+function tanya(tajuk, teks, labelYa, cb, bahaya){
+  window.__ya = function(){ tutupModal(); cb(); };
+  modal('<div class="mico" style="background:'+(bahaya?'var(--bad)':'var(--warn)')+'">'+(bahaya?'!':'?')+'</div>'+
+    '<h3 class="center">'+esc(tajuk)+'</h3><p class="center" style="line-height:1.55">'+teks+'</p>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn '+(bahaya?'btn-d':'btn-p')+'" onclick="window.__ya()">'+esc(labelYa)+'</button></div>');
+}
+function maklum(tajuk, teks, jenis){
+  modal('<div class="mico" style="background:'+(jenis==='e'?'var(--bad)':'var(--ok)')+'">'+(jenis==='e'?'!':'\u2713')+'</div>'+
+    '<h3 class="center">'+esc(tajuk)+'</h3><div class="center" style="line-height:1.6">'+teks+'</div>'+
+    '<div class="mact"><button class="btn btn-p" onclick="tutupModal()">Tutup</button></div>');
+}
+
+/* ---------- setup URL ---------- */
+function simpanUrl(){
+  var v = $('setup-url').value.trim();
+  if (v.indexOf('https://script.google.com') !== 0 || v.indexOf('/exec') < 0){
+    $('setup-err').textContent = 'URL kena bermula dengan https://script.google.com dan berakhir dengan /exec';
+    $('setup-err').classList.remove('hide');
+    return;
+  }
+  localStorage.setItem('juri_api_url', v);
+  location.reload();
+}
+
+/* ---------- login ---------- */
+function ralatLogin(m){
+  var e = $('login-err');
+  if (!m){ e.classList.add('hide'); return; }
+  e.textContent = m; e.classList.remove('hide');
+}
+
+function muatBranding(){
+  return api('brandingLogin', {}, true).then(function(b){
+    var logos = '';
+    if (b.logo1) logos += '<img src="'+esc(b.logo1)+'" onerror="this.style.display=\'none\'">';
+    if (b.logo2) logos += '<img src="'+esc(b.logo2)+'" onerror="this.style.display=\'none\'">';
+    $('login-logos').innerHTML = logos;
+    if (b.nama) $('login-title').textContent = b.nama;
+    $('login-sub').textContent = b.tahun ? ('Penilaian Juri ' + b.tahun) : 'Sila log masuk untuk meneruskan';
+    $('login-wm').textContent = b.watermark || '';
+    ST.branding = b;
+  }).catch(function(){ /* branding tak kritikal */ });
+}
+
+$('login-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  ralatLogin('');
+  $('login-btn').disabled = true;
+  api('login', { id: $('in-id').value, kod: $('in-kod').value })
+    .then(function(s){
+      S = { token:s.token, nama:s.nama, role:s.role, userId:s.userId };
+      localStorage.setItem('juri_token', s.token);
+      $('in-kod').value = '';
+      mulaApp();
+    })
+    .catch(function(err){ ralatLogin(err.message); })
+    .then(function(){ $('login-btn').disabled = false; });
+});
+
+function logout(){
+  tanya('Pengesahan', 'Adakah anda pasti untuk log keluar?', 'Ya, Log Keluar', function(){
+    api('logout', {}, true).catch(function(){});
+    bersihSesi();
+    tunjuk('login');
+    muatBranding();
+  });
+}
+
+/* ---------- shell ---------- */
+var LABEL_ROLE = { juri:'Juri', admin:'Admin', superadmin:'Superadmin' };
+
+function mulaApp(){
+  $('top-nama').textContent = S.nama;
+  $('top-role').textContent = LABEL_ROLE[S.role] || S.role;
+  tunjuk('app');
+  if (S.role === 'juri') shellJuri();
+  else shellAdmin();
+}
+
+function setTabs(senarai, aktif, onPilih){
+  $('tabs').innerHTML = senarai.map(function(t){
+    return '<button class="tab'+(t.k===aktif?' on':'')+'" data-k="'+t.k+'">'+esc(t.l)+'</button>';
+  }).join('');
+  Array.prototype.forEach.call($('tabs').children, function(b){
+    b.onclick = function(){ onPilih(b.dataset.k); };
+  });
+}
+
+function setBrandingApp(ev){
+  var logos = '';
+  if (ev.logo1) logos += '<img src="'+esc(ev.logo1)+'" onerror="this.style.display=\'none\'">';
+  if (ev.logo2) logos += '<img src="'+esc(ev.logo2)+'" onerror="this.style.display=\'none\'">';
+  $('top-logos').innerHTML = logos;
+  $('top-title').textContent = ev.nama || 'Sistem Penilaian Juri';
+  $('top-ev').textContent = (ev.tahun ? ev.tahun + ' · ' : '') + (ev.bilHari ? ev.bilHari + ' hari' : '') +
+    (ev.status && ev.status !== 'Aktif' ? ' · ' + ev.status : '');
+  $('app-wm').textContent = ev.watermark || '';
+}
+
+/* ===========================================================================
+   BAHAGIAN JURI
+   =========================================================================== */
+function shellJuri(){
+  spin(true);
+  api('juriWorkspace', {}, true).then(function(w){
+    spin(false);
+    ST.ws = w;
+    setBrandingApp(w.event);
+    if (!w.peserta.length){
+      $('tabs').innerHTML = '';
+      $('panes').innerHTML = '<div class="card"><div class="alert i">Tiada peserta ditetapkan untuk anda. Hubungi admin.</div></div>';
+      return;
+    }
+    ST.hariPilih = w.hari[0];
+    ST.tabsHari = w.hari.map(function(h){ return { k:String(h), l:'HARI '+h }; });
+    setTabs(ST.tabsHari, String(ST.hariPilih), pilihHariJuri);
+    juriSenarai();
+  }).catch(function(e){
+    spin(false);
+    $('panes').innerHTML = '<div class="card"><div class="alert e">'+esc(e.message)+'</div></div>';
+  });
+}
+
+function pilihHariJuri(k){
+  ST.hariPilih = Number(k);
+  setTabs(ST.tabsHari, String(k), pilihHariJuri);
+  juriSenarai();
+}
+
+function juriSenarai(){
+  var w = ST.ws;
+  var list = w.peserta.filter(function(p){ return p.hari === ST.hariPilih; });
+  var siap = list.filter(function(p){ return p.sudah; }).length;
+  var pct = list.length ? Math.round(siap/list.length*100) : 0;
+
+  var html = '<div class="card">'+
+    '<h3 class="sec">Kemajuan Hari '+ST.hariPilih+'</h3>'+
+    '<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>'+
+    '<div class="center" style="font-weight:600;color:var(--navy)">'+siap+' daripada '+list.length+' peserta sudah dinilai ('+pct+'%)</div>'+
+    (!w.bolehHantar ? '<div class="alert i" style="margin:1rem 0 0">Event ini sudah ditutup. Anda hanya boleh melihat markah.</div>' : '')+
+    '</div>';
+
+  html += '<div class="card"><h3 class="sec">Pilih Peserta</h3>'+
+    '<input class="f" id="cari" placeholder="Cari nama, nombor pembentang atau tajuk projek..." style="margin-bottom:1rem">'+
+    '<div class="plist" id="plist"></div></div>';
+
+  $('panes').innerHTML = html;
+  renderPlist(list, '');
+  $('cari').addEventListener('input', function(){ renderPlist(list, this.value.toLowerCase()); });
+}
+
+function renderPlist(list, q){
+  var f = list.filter(function(p){
+    if (!q) return true;
+    return (p.nama+' '+p.no+' '+p.tajuk).toLowerCase().indexOf(q) >= 0;
+  });
+  $('plist').innerHTML = f.length ? f.map(function(p){
+    return '<div class="pcard'+(p.sudah?' done':'')+'" onclick="juriBorang(\''+p.id+'\')">'+
+      '<div class="no"><span>'+esc(p.no)+'</span>'+
+      (p.sudah?'<span class="pill ok">\u2713 Sudah dinilai</span>':'<span class="pill info">Belum</span>')+'</div>'+
+      '<div class="nm">'+esc(p.nama)+'</div>'+
+      '<div class="tj">'+esc(p.tajuk)+'</div></div>';
+  }).join('') : '<div class="muted">Tiada peserta sepadan.</div>';
+}
+
+function juriBorang(pesertaId){
+  var w = ST.ws;
+  var p = null;
+  w.peserta.forEach(function(x){ if (x.id === pesertaId) p = x; });
+  if (!p) return;
+
+  api('markahJuri', { pesertaId: pesertaId }).then(function(ada){
+    ST.borang = { peserta:p, markah:{}, asal:ada, edit:Object.keys(ada).length>0 };
+    w.anugerah.forEach(function(a){
+      a.kriteria.forEach(function(k){ ST.borang.markah[k.id] = Number(ada[k.id]) || 0; });
+    });
+    renderBorang();
+    window.scrollTo(0,0);
+  }).catch(function(e){ maklum('Ralat', esc(e.message), 'e'); });
+}
+
+function renderBorang(){
+  var w = ST.ws, b = ST.borang, p = b.peserta;
+  var html = '<div class="card">'+
+    '<button class="btn btn-sm btn-o" onclick="juriSenarai()" style="margin-bottom:1rem">\u2190 Kembali ke senarai</button>'+
+    '<div style="text-align:center">'+
+      '<div style="font-weight:700;color:var(--navy);font-size:1.25rem">'+esc(p.no)+'</div>'+
+      '<div style="font-weight:600;margin:.3rem 0">'+esc(p.nama)+'</div>'+
+      '<div class="muted" style="font-size:.95rem">'+esc(p.tajuk)+'</div>'+
+      (b.edit?'<div class="pill warn" style="margin-top:.7rem">Mengemaskini markah yang telah dihantar</div>':'')+
+    '</div></div>';
+
+  html += '<div class="card"><div class="prog-bar"><div class="prog-fill" id="bf"></div></div>'+
+    '<div class="center" style="font-weight:600;color:var(--navy)" id="bt"></div></div>';
+
+  w.anugerah.forEach(function(a, ai){
+    html += '<div class="ang-sec">'+
+      '<div class="ang-head" onclick="togAng(\''+a.id+'\')">'+
+        '<div class="t">'+esc(a.nama)+'</div>'+
+        '<div class="ang-sc" id="sc-'+a.id+'">0/'+a.maks+'</div>'+
+      '</div>'+
+      '<div class="ang-body'+(ai===0?' on':'')+'" id="body-'+a.id+'">';
+    a.kriteria.forEach(function(k){
+      html += '<div class="krit"><div class="krit-t">'+esc(k.teks)+'</div>'+
+        (k.tooltip?'<div class="krit-h">'+esc(k.tooltip)+'</div>':'')+
+        '<div class="sbtns" id="sb-'+k.id+'">';
+      for (var i=1; i<=k.maks; i++){
+        html += '<button type="button" class="sbtn" data-k="'+k.id+'" data-v="'+i+'" onclick="pilihSkor(\''+k.id+'\','+i+')">'+i+'</button>';
+      }
+      html += '</div><div class="slab"><span>'+esc(w.event.labelMin)+'</span><span>'+esc(w.event.labelMaks)+'</span></div></div>';
+    });
+    html += '</div></div>';
+  });
+
+  html += '<div class="total-box"><div class="n" id="jum">0</div><div class="l">Markah Keseluruhan / '+w.jumlahMaks+'</div></div>';
+
+  html += '<div class="sticky-act">';
+  if (w.bolehHantar){
+    html += '<button class="btn btn-p" id="btn-hantar" onclick="hantarMarkah()">'+(b.edit?'Kemaskini Markah':'Hantar Markah')+'</button>'+
+            '<button class="btn btn-s" onclick="kosongkanBorang()">Kosongkan</button>';
+    if (b.edit) html += '<button class="btn btn-d" onclick="padamMarkahSaya()">Padam Markah</button>';
+  } else {
+    html += '<span class="muted">Event ditutup — markah tidak boleh diubah.</span>';
+  }
+  html += '</div>';
+
+  $('panes').innerHTML = html;
+  // tandakan nilai sedia ada
+  Object.keys(b.markah).forEach(function(kid){
+    if (b.markah[kid] > 0) tandaSkor(kid, b.markah[kid]);
+  });
+  kiraBorang();
+}
+
+function togAng(id){
+  var el = $('body-'+id);
+  if (el) el.classList.toggle('on');
+}
+
+function tandaSkor(kid, v){
+  var box = $('sb-'+kid);
+  if (!box) return;
+  Array.prototype.forEach.call(box.children, function(b){
+    b.classList.toggle('on', Number(b.dataset.v) === Number(v));
+  });
+}
+
+function pilihSkor(kid, v){
+  if (!ST.ws.bolehHantar) return;
+  ST.borang.markah[kid] = v;
+  tandaSkor(kid, v);
+  kiraBorang();
+}
+
+function kiraBorang(){
+  var w = ST.ws, b = ST.borang;
+  var jum = 0, isi = 0, bil = 0;
+  w.anugerah.forEach(function(a){
+    var s = 0;
+    a.kriteria.forEach(function(k){
+      var v = Number(b.markah[k.id]) || 0;
+      s += v; bil++; if (v > 0) isi++;
+    });
+    jum += s;
+    var el = $('sc-'+a.id);
+    if (el) el.textContent = s + '/' + a.maks;
+  });
+  $('jum').textContent = jum;
+  var pct = bil ? Math.round(isi/bil*100) : 0;
+  $('bf').style.width = pct + '%';
+  $('bt').textContent = 'Kemajuan: ' + pct + '% (' + isi + '/' + bil + ' kriteria dinilai)';
+  var btn = $('btn-hantar');
+  if (btn) btn.disabled = (isi < bil);
+}
+
+function kosongkanBorang(){
+  tanya('Pengesahan', 'Kosongkan semua markah dalam borang ini?', 'Ya, Kosongkan', function(){
+    Object.keys(ST.borang.markah).forEach(function(k){
+      ST.borang.markah[k] = 0;
+      var box = $('sb-'+k);
+      if (box) Array.prototype.forEach.call(box.children, function(b){ b.classList.remove('on'); });
+    });
+    kiraBorang();
+  });
+}
+
+function hantarMarkah(){
+  var b = ST.borang;
+  var kosong = Object.keys(b.markah).filter(function(k){ return !b.markah[k]; });
+  if (kosong.length){ maklum('Belum Lengkap', 'Masih ada '+kosong.length+' kriteria belum dinilai.', 'e'); return; }
+  var jum = Object.keys(b.markah).reduce(function(t,k){ return t + Number(b.markah[k]); }, 0);
+  tanya(b.edit ? 'Kemaskini Markah' : 'Hantar Markah',
+    'Peserta: <b>'+esc(b.peserta.no)+' — '+esc(b.peserta.nama)+'</b><br>Jumlah markah: <b>'+jum+' / '+ST.ws.jumlahMaks+'</b>'+
+    '<br><span class="muted">Anda masih boleh kemaskini selepas ini.</span>',
+    b.edit ? 'Ya, Kemaskini' : 'Ya, Hantar', function(){
+      api('hantarMarkah', { pesertaId: b.peserta.id, markah: b.markah }).then(function(){
+        ST.ws.peserta.forEach(function(p){ if (p.id === b.peserta.id) p.sudah = true; });
+        toast('Markah berjaya disimpan ke Google Sheet.');
+        juriSenarai();
+        window.scrollTo(0,0);
+      }).catch(function(e){ maklum('Gagal Simpan', esc(e.message), 'e'); });
+    });
+}
+
+function padamMarkahSaya(){
+  var b = ST.borang;
+  tanya('Padam Markah', 'Padam markah anda untuk <b>'+esc(b.peserta.nama)+'</b>? Tindakan ini tidak boleh dibatalkan.',
+    'Ya, Padam', function(){
+      api('padamMarkahSendiri', { pesertaId: b.peserta.id }).then(function(){
+        ST.ws.peserta.forEach(function(p){ if (p.id === b.peserta.id) p.sudah = false; });
+        toast('Markah dipadam.');
+        juriSenarai();
+      }).catch(function(e){ maklum('Gagal', esc(e.message), 'e'); });
+    }, true);
+}
+
+/* ===========================================================================
+   BAHAGIAN ADMIN / SUPERADMIN
+   =========================================================================== */
+function shellAdmin(){
+  var tabs = [{k:'rank',l:'Ranking'},{k:'prog',l:'Progres Juri'}];
+  if (S.role === 'superadmin'){
+    tabs = tabs.concat([{k:'event',l:'Event'},{k:'peserta',l:'Peserta'},{k:'juri',l:'Juri'},
+                        {k:'struktur',l:'Anugerah & Kriteria'},{k:'akaun',l:'Akaun Admin'},{k:'audit',l:'Audit Log'}]);
+  }
+  ST.tabsAdmin = tabs;
+  spin(true);
+  api('senaraiEventRingkas', {}, true).then(function(list){
+    spin(false);
+    ST.events = list;
+    var aktif = null;
+    list.forEach(function(e){ if (e.status === 'Aktif') aktif = e; });
+    ST.evId = aktif ? aktif.id : (list.length ? list[list.length-1].id : null);
+    pilihTabAdmin('rank');
+  }).catch(function(e){
+    spin(false);
+    $('panes').innerHTML = '<div class="card"><div class="alert e">'+esc(e.message)+'</div></div>';
+  });
+}
+
+function pilihTabAdmin(k){
+  ST.tabAdmin = k;
+  setTabs(ST.tabsAdmin, k, pilihTabAdmin);
+  ({ rank:paneRank, prog:paneProg, event:paneEvent, peserta:panePeserta,
+     juri:paneJuri, struktur:paneStruktur, akaun:paneAkaun, audit:paneAudit })[k]();
+}
+
+function pilihEvent(){
+  var opts = ST.events.map(function(e){
+    return '<option value="'+e.id+'"'+(e.id===ST.evId?' selected':'')+'>'+esc(e.nama)+' ('+esc(e.tahun)+') — '+esc(e.status)+'</option>';
+  }).join('');
+  return '<div style="margin-bottom:1rem"><label class="f">Event</label>'+
+    '<select class="f" onchange="tukarEvent(this.value)">'+opts+'</select></div>';
+}
+function tukarEvent(id){ ST.evId = id; pilihTabAdmin(ST.tabAdmin); }
+
+/* ---------- RANKING ---------- */
+function paneRank(){
+  if (!ST.evId){ $('panes').innerHTML = '<div class="card"><div class="alert i">Tiada event. Cipta event di tab Event.</div></div>'; return; }
+  api('dashboard', { eventId: ST.evId, hari: ST.rankHari || 'semua' }).then(function(d){
+    ST.dash = d;
+    setBrandingApp(d.event);
+    if (!ST.rankAng) ST.rankAng = 'KESELURUHAN';
+
+    var hariBtn = '<button class="stab'+((!ST.rankHari||ST.rankHari==='semua')?' on':'')+'" onclick="setRankHari(\'semua\')">Semua Hari</button>';
+    for (var h=1; h<=d.event.bilHari; h++){
+      hariBtn += '<button class="stab'+(String(ST.rankHari)===String(h)?' on':'')+'" onclick="setRankHari('+h+')">Hari '+h+'</button>';
+    }
+    var angBtn = '<button class="stab'+(ST.rankAng==='KESELURUHAN'?' on':'')+'" onclick="setRankAng(\'KESELURUHAN\')">Keseluruhan</button>' +
+      d.anugerah.map(function(a){
+        return '<button class="stab'+(ST.rankAng===a.id?' on':'')+'" onclick="setRankAng(\''+a.id+'\')">'+esc(a.nama)+'</button>';
+      }).join('');
+
+    var html = '<div class="card">'+ pilihEvent() +
+      '<label class="f">Hari</label><div class="subtabs">'+hariBtn+'</div>'+
+      '<label class="f">Kategori Anugerah</label><div class="subtabs">'+angBtn+'</div>'+
+      '<div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem">'+
+        '<button class="btn btn-sm btn-o" onclick="ST.tunjukJuri=!ST.tunjukJuri;paneRank()">'+(ST.tunjukJuri?'Sembunyi':'Tunjuk')+' markah setiap juri</button>'+
+        '<button class="btn btn-sm btn-p" onclick="exportCsv()">Export Excel (CSV)</button>'+
+        '<button class="btn btn-sm btn-s" onclick="window.print()">Cetak / PDF</button>'+
+      '</div></div>';
+
+    html += '<div class="card">' + jadualRank(d) + '</div>';
+    $('panes').innerHTML = html;
+  }).catch(function(e){
+    $('panes').innerHTML = '<div class="card">'+pilihEvent()+'<div class="alert e">'+esc(e.message)+'</div></div>';
+  });
+}
+function setRankHari(h){ ST.rankHari = h; paneRank(); }
+function setRankAng(a){ ST.rankAng = a; paneRank(); }
+
+function barisRank(d){
+  var ang = ST.rankAng;
+  var rows = d.baris.map(function(r){
+    var nilai = (ang === 'KESELURUHAN') ? r.keseluruhan : (r.anugerah[ang] ? r.anugerah[ang].purata : 0);
+    var bil   = (ang === 'KESELURUHAN') ? r.bilJuri : (r.anugerah[ang] ? r.anugerah[ang].bilJuri : 0);
+    return { r:r, nilai:nilai, bil:bil };
+  });
+  rows.sort(function(a,b){ return b.nilai - a.nilai; });
+  // kedudukan standard competition ranking (1,2,2,4)
+  for (var i=0; i<rows.length; i++){
+    var samaAtas = (i > 0 && Math.abs(rows[i].nilai - rows[i-1].nilai) < 0.0001);
+    rows[i].ked = samaAtas ? rows[i-1].ked : (i + 1);
+    rows[i].seri = false;
+  }
+  // tandakan seri (dua hala) hanya untuk markah bukan sifar
+  for (var j=1; j<rows.length; j++){
+    if (Math.abs(rows[j].nilai - rows[j-1].nilai) < 0.0001 && rows[j].nilai > 0){
+      rows[j].seri = true; rows[j-1].seri = true;
+    }
+  }
+  return rows;
+}
+
+function jadualRank(d){
+  var ang = ST.rankAng;
+  var maks = (ang === 'KESELURUHAN') ? d.jumlahMaks : (function(){
+    var m = 0; d.anugerah.forEach(function(a){ if (a.id===ang) m = a.maks; }); return m;
+  })();
+  var tajuk = (ang === 'KESELURUHAN') ? 'Keseluruhan' : (function(){
+    var n=''; d.anugerah.forEach(function(a){ if (a.id===ang) n=a.nama; }); return n;
+  })();
+  var rows = barisRank(d);
+  if (!rows.length) return '<div class="alert i">Tiada peserta untuk pilihan ini.</div>';
+
+  var head = '<tr><th class="nowrap">#</th><th class="nowrap">No.</th><th>Nama Peserta</th><th>Tajuk Projek</th><th class="nowrap">Hari</th>'+
+             '<th class="nowrap right">Purata</th><th class="nowrap center">Bil. Juri</th>';
+  if (ST.tunjukJuri) d.juri.forEach(function(j){ head += '<th class="nowrap right" title="'+esc(j.nama)+'">'+esc(j.id)+'</th>'; });
+  head += '</tr>';
+
+  var body = rows.map(function(x){
+    var r = x.r;
+    var kurang = x.bil > 0 && x.bil < d.event.minJuri;
+    var tds = '<td><b>'+(x.nilai>0?x.ked:'-')+'</b>'+(x.seri&&x.nilai>0?' <span class="pill warn">seri</span>':'')+'</td>'+
+      '<td class="nowrap">'+esc(r.no)+'</td>'+
+      '<td><b>'+esc(r.nama)+'</b></td>'+
+      '<td class="muted">'+esc(r.tajuk)+'</td>'+
+      '<td class="center">'+r.hari+'</td>'+
+      '<td class="right"><b>'+x.nilai.toFixed(2)+'</b> <span class="muted">/'+maks+'</span></td>'+
+      '<td class="center">'+x.bil+(kurang?' <span class="pill bad" title="Kurang daripada '+d.event.minJuri+' juri">!</span>':'')+'</td>';
+    if (ST.tunjukJuri){
+      d.juri.forEach(function(j){
+        var v = (ang === 'KESELURUHAN')
+          ? (function(){
+              var t = 0, adaSatu = false;
+              d.anugerah.forEach(function(a){
+                var pj = r.anugerah[a.id] && r.anugerah[a.id].perJuri;
+                if (pj && pj[j.id] !== undefined){ t += pj[j.id]; adaSatu = true; }
+              });
+              return adaSatu ? t : null;
+            })()
+          : (r.anugerah[ang] && r.anugerah[ang].perJuri[j.id] !== undefined ? r.anugerah[ang].perJuri[j.id] : null);
+        tds += '<td class="right">'+(v===null?'<span class="muted">—</span>':v)+'</td>';
+      });
+    }
+    return '<tr>'+tds+'</tr>';
+  }).join('');
+
+  var nota = '<div class="muted" style="margin-bottom:.75rem">Ranking: <b>'+esc(tajuk)+'</b> · '+
+    rows.length+' peserta · purata dikira merentas juri yang menilai · minimum juri ditetapkan: '+d.event.minJuri+
+    '<br>Tanda <span class="pill bad">!</span> bermaksud bilangan juri kurang daripada minimum. Tanda seri bermaksud purata sama.</div>';
+
+  return nota + '<div class="scroll"><table class="t"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
+}
+
+function exportCsv(){
+  var d = ST.dash;
+  if (!d) return;
+  var rows = barisRank(d);
+  var ang = ST.rankAng;
+  var hdr = ['Kedudukan','No. Pembentang','Nama Peserta','Tajuk Projek','Hari','Purata','Bil. Juri'];
+  d.juri.forEach(function(j){ hdr.push(j.nama + ' ('+j.id+')'); });
+  var lines = [hdr];
+  rows.forEach(function(x){
+    var r = x.r;
+    var line = [x.nilai>0?x.ked:'', r.no, r.nama, r.tajuk, r.hari, x.nilai.toFixed(2), x.bil];
+    d.juri.forEach(function(j){
+      var v;
+      if (ang === 'KESELURUHAN'){
+        var t = 0, ada = false;
+        d.anugerah.forEach(function(a){
+          var pj = r.anugerah[a.id] && r.anugerah[a.id].perJuri;
+          if (pj && pj[j.id] !== undefined){ t += pj[j.id]; ada = true; }
+        });
+        v = ada ? t : '';
+      } else {
+        v = (r.anugerah[ang] && r.anugerah[ang].perJuri[j.id] !== undefined) ? r.anugerah[ang].perJuri[j.id] : '';
+      }
+      line.push(v);
+    });
+    lines.push(line);
+  });
+  var csv = '\uFEFF' + lines.map(function(l){
+    return l.map(function(c){ return '"' + String(c==null?'':c).replace(/"/g,'""') + '"'; }).join(',');
+  }).join('\r\n');
+  var namaAng = (ang === 'KESELURUHAN') ? 'Keseluruhan' : (function(){ var n=''; d.anugerah.forEach(function(a){ if(a.id===ang) n=a.nama; }); return n; })();
+  var blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Ranking_' + (d.event.nama||'Event').replace(/[^\w]+/g,'_') + '_' + namaAng.replace(/[^\w]+/g,'_') + '.csv';
+  a.click();
+  toast('Fail CSV dimuat turun. Boleh buka dengan Excel.');
+}
+
+/* ---------- PROGRES ---------- */
+function paneProg(){
+  if (!ST.evId){ $('panes').innerHTML = '<div class="card"><div class="alert i">Tiada event.</div></div>'; return; }
+  api('progres', { eventId: ST.evId }).then(function(d){
+    setBrandingApp(d.event);
+    var rows = d.juri.map(function(j){
+      var pct = j.jumlah ? Math.round(j.siap/j.jumlah*100) : 0;
+      var warna = pct===100 ? 'ok' : (pct>0 ? 'warn' : 'bad');
+      return '<tr><td><b>'+esc(j.nama)+'</b><div class="muted">'+esc(j.id)+'</div></td>'+
+        '<td class="nowrap">'+(j.hari.length===d.event.bilHari?'Semua':j.hari.join(', '))+'</td>'+
+        '<td class="center">'+j.siap+' / '+j.jumlah+'</td>'+
+        '<td><div class="prog-bar" style="margin:0"><div class="prog-fill" style="width:'+pct+'%"></div></div>'+
+          '<div class="center muted" style="margin-top:.2rem">'+pct+'%</div></td>'+
+        '<td><span class="pill '+warna+'">'+(pct===100?'Selesai':(pct>0?'Dalam proses':'Belum mula'))+'</span></td>'+
+        '<td>'+(j.belum.length ? '<details><summary class="muted" style="cursor:pointer">'+j.belum.length+' belum dinilai</summary><div class="muted" style="margin-top:.4rem;line-height:1.5">'+j.belum.map(esc).join('<br>')+'</div></details>' : '<span class="muted">—</span>')+'</td></tr>';
+    }).join('');
+
+    $('panes').innerHTML = '<div class="card">'+pilihEvent()+
+      '<div class="muted">'+d.juri.length+' juri · '+d.bilPeserta+' peserta · '+d.event.bilHari+' hari</div>'+
+      '<div style="margin-top:.7rem"><button class="btn btn-sm btn-s" onclick="window.print()">Cetak / PDF</button></div></div>'+
+      '<div class="card"><h3 class="sec">Progres Penilaian Setiap Juri</h3>'+
+      (rows ? '<div class="scroll"><table class="t"><thead><tr><th>Juri</th><th>Hari</th><th class="center">Siap</th><th>Kemajuan</th><th>Status</th><th>Belum dinilai</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+            : '<div class="alert i">Tiada juri ditugaskan untuk event ini.</div>')+'</div>';
+  }).catch(function(e){
+    $('panes').innerHTML = '<div class="card">'+pilihEvent()+'<div class="alert e">'+esc(e.message)+'</div></div>';
+  });
+}
+
+/* ---------- EVENT ---------- */
+function paneEvent(){
+  api('senaraiEvent', {}).then(function(list){
+    ST.eventsFull = list;
+    ST.events = list.map(function(e){ return {id:e.id,nama:e.nama,tahun:e.tahun,status:e.status,bilHari:e.bilHari}; });
+    var rows = list.map(function(e){
+      var p = { Aktif:'ok', Draf:'info', Tutup:'warn', Arkib:'bad' }[e.status] || 'info';
+      return '<tr><td><b>'+esc(e.nama)+'</b><div class="muted">'+esc(e.id)+'</div></td>'+
+        '<td class="center">'+esc(e.tahun)+'</td><td class="center">'+e.bilHari+'</td>'+
+        '<td class="center">'+e.bilPeserta+'</td><td class="center">'+e.bilMarkah+'</td>'+
+        '<td><span class="pill '+p+'">'+esc(e.status)+'</span></td>'+
+        '<td class="nowrap">'+
+          '<button class="btn btn-sm btn-o" onclick="formEvent(\''+e.id+'\')">Edit</button> '+
+          (e.status!=='Aktif' ? '<button class="btn btn-sm btn-p" onclick="statusEvent(\''+e.id+'\',\'Aktif\')">Jadikan Aktif</button> ' : '<button class="btn btn-sm btn-s" onclick="statusEvent(\''+e.id+'\',\'Tutup\')">Tutup</button> ')+
+          '<button class="btn btn-sm btn-s" onclick="statusEvent(\''+e.id+'\',\'Arkib\')">Arkib</button>'+
+        '</td></tr>';
+    }).join('');
+
+    $('panes').innerHTML =
+      '<div class="card"><h3 class="sec">Senarai Event</h3>'+
+      '<div class="alert i">Hanya <b>satu</b> event boleh berstatus Aktif. Bila anda jadikan event lain Aktif, event lama bertukar ke Tutup secara automatik. Juri hanya boleh hantar markah untuk event Aktif.</div>'+
+      '<div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem">'+
+        '<button class="btn btn-p" onclick="formEvent()">+ Event Baru</button>'+
+        '<button class="btn btn-o" onclick="formDuplicate()">Duplicate Event (guna tahun lepas)</button>'+
+      '</div>'+
+      '<div class="scroll"><table class="t"><thead><tr><th>Nama Event</th><th class="center">Tahun</th><th class="center">Hari</th><th class="center">Peserta</th><th class="center">Rekod Markah</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card"><div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+function formEvent(id){
+  var e = { nama:'', tahun:new Date().getFullYear(), bilHari:3, logo1:'', logo2:'', watermark:'', labelMin:'Kurang Baik', labelMaks:'Cemerlang', minJuri:3 };
+  if (id) ST.eventsFull.forEach(function(x){ if (x.id===id) e = x; });
+  modal('<h3>'+(id?'Edit Event':'Event Baru')+'</h3>'+
+    '<div class="row c2"><div><label class="f">Nama Event</label><input class="f" id="e-nama" value="'+esc(e.nama)+'"></div>'+
+    '<div><label class="f">Tahun</label><input class="f" id="e-tahun" value="'+esc(e.tahun)+'"></div></div>'+
+    '<div class="row c3"><div><label class="f">Bilangan Hari</label><input class="f" id="e-hari" type="number" min="1" max="14" value="'+e.bilHari+'"></div>'+
+    '<div><label class="f">Min. Juri</label><input class="f" id="e-minj" type="number" min="1" max="20" value="'+e.minJuri+'"></div>'+
+    '<div><label class="f">Label Markah Rendah</label><input class="f" id="e-lmin" value="'+esc(e.labelMin||'')+'"></div></div>'+
+    '<div class="row c2"><div><label class="f">Label Markah Tinggi</label><input class="f" id="e-lmax" value="'+esc(e.labelMaks||'')+'"></div>'+
+    '<div><label class="f">Teks Watermark</label><input class="f" id="e-wm" value="'+esc(e.watermark||'')+'"></div></div>'+
+    '<div class="row c2"><div><label class="f">URL Logo 1</label><input class="f" id="e-l1" value="'+esc(e.logo1||'')+'"></div>'+
+    '<div><label class="f">URL Logo 2</label><input class="f" id="e-l2" value="'+esc(e.logo2||'')+'"></div></div>'+
+    '<p class="muted">Event baru bermula dengan status Draf. Tambah anugerah, kriteria, peserta dan juri dahulu, kemudian jadikan Aktif.</p>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanEvent(\''+(id||'')+'\')">Simpan</button></div>');
+}
+
+function simpanEvent(id){
+  var d = {
+    id: id || null, nama: $('e-nama').value.trim(), tahun: $('e-tahun').value.trim(),
+    bilHari: $('e-hari').value, minJuri: $('e-minj').value,
+    labelMin: $('e-lmin').value.trim(), labelMaks: $('e-lmax').value.trim(),
+    watermark: $('e-wm').value.trim(), logo1: $('e-l1').value.trim(), logo2: $('e-l2').value.trim()
+  };
+  if (!d.nama){ toast('Nama event diperlukan.'); return; }
+  api('simpanEvent', d).then(function(){ tutupModal(); toast('Event disimpan.'); paneEvent(); })
+    .catch(function(e){ toast(e.message); });
+}
+
+function formDuplicate(){
+  var opts = ST.eventsFull.map(function(e){ return '<option value="'+e.id+'">'+esc(e.nama)+' ('+esc(e.tahun)+')</option>'; }).join('');
+  if (!opts){ toast('Tiada event untuk diduplikasi.'); return; }
+  var thn = new Date().getFullYear();
+  modal('<h3>Duplicate Event</h3>'+
+    '<p class="muted" style="line-height:1.55">Semua anugerah dan kriteria dari event sumber akan disalin. Peserta <b>tidak</b> disalin — import senarai baru selepas ini.</p>'+
+    '<div style="margin-bottom:1rem"><label class="f">Salin daripada</label><select class="f" id="d-src">'+opts+'</select></div>'+
+    '<div class="row c3"><div><label class="f">Nama Event Baru</label><input class="f" id="d-nama" placeholder="SEMTEC '+thn+'"></div>'+
+    '<div><label class="f">Tahun</label><input class="f" id="d-tahun" value="'+thn+'"></div>'+
+    '<div><label class="f">Bilangan Hari</label><input class="f" id="d-hari" type="number" min="1" max="14" value="3"></div></div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="d-juri"> Salin juga senarai tugasan juri</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="buatDuplicate()">Duplicate</button></div>');
+}
+
+function buatDuplicate(){
+  var d = { sumberId: $('d-src').value, nama: $('d-nama').value.trim(), tahun: $('d-tahun').value.trim(),
+            bilHari: $('d-hari').value, salinJuri: $('d-juri').checked };
+  if (!d.nama){ toast('Nama event baru diperlukan.'); return; }
+  api('duplicateEvent', d).then(function(r){
+    tutupModal();
+    maklum('Berjaya', 'Event baru <b>'+esc(r.id)+'</b> dicipta.<br>'+r.anugerah+' anugerah, '+r.kriteria+' kriteria'+(r.juri?', '+r.juri+' tugasan juri':'')+' disalin.<br><br>Langkah seterusnya: import senarai peserta, kemudian jadikan event ini Aktif.');
+    paneEvent();
+  }).catch(function(e){ toast(e.message); });
+}
+
+function statusEvent(id, status){
+  var teks = status==='Aktif' ? 'Jadikan event ini <b>Aktif</b>? Event aktif lain akan ditutup secara automatik.'
+           : status==='Tutup' ? 'Tutup event ini? Juri tidak lagi boleh hantar atau ubah markah.'
+           : 'Arkibkan event ini? Data kekal tetapi event tidak boleh digunakan.';
+  tanya('Pengesahan', teks, 'Ya, Teruskan', function(){
+    api('setStatusEvent', { eventId:id, status:status }).then(function(){ toast('Status dikemaskini.'); paneEvent(); })
+      .catch(function(e){ toast(e.message); });
+  }, status!=='Aktif');
+}
+
+/* ---------- PESERTA ---------- */
+function panePeserta(){
+  if (!ST.evId){ $('panes').innerHTML = '<div class="card"><div class="alert i">Cipta event dahulu.</div></div>'; return; }
+  api('senaraiPeserta', { eventId: ST.evId }).then(function(list){
+    ST.peserta = list;
+    var ev = null; ST.events.forEach(function(e){ if (e.id===ST.evId) ev = e; });
+    var rows = list.map(function(p){
+      return '<tr><td class="nowrap">'+esc(p.no)+'</td><td><b>'+esc(p.nama)+'</b><div class="muted">'+esc(p.id)+'</div></td>'+
+        '<td class="muted">'+esc(p.tajuk)+'</td><td class="center">'+p.hari+'</td>'+
+        '<td class="center">'+p.bilJuri+'</td>'+
+        '<td><span class="pill '+(p.aktif?'ok':'bad')+'">'+(p.aktif?'Aktif':'Tidak')+'</span></td>'+
+        '<td class="nowrap"><button class="btn btn-sm btn-o" onclick="formPeserta(\''+p.id+'\')">Edit</button> '+
+        '<button class="btn btn-sm btn-s" onclick="resetPeserta(\''+p.id+'\',\''+esc(p.nama).replace(/'/g,"\\'")+'\')">Reset Markah</button> '+
+        '<button class="btn btn-sm btn-d" onclick="padamPeserta(\''+p.id+'\',\''+esc(p.nama).replace(/'/g,"\\'")+'\')">Padam</button></td></tr>';
+    }).join('');
+    var ikutHari = {};
+    list.forEach(function(p){ if (p.aktif) ikutHari[p.hari] = (ikutHari[p.hari]||0)+1; });
+    var ringkas = Object.keys(ikutHari).sort().map(function(h){ return 'Hari '+h+': '+ikutHari[h]; }).join(' · ');
+
+    $('panes').innerHTML = '<div class="card">'+pilihEvent()+
+      '<div class="muted">'+list.length+' peserta'+(ringkas?' · '+ringkas:'')+(ev?' · event ini ada '+ev.bilHari+' hari':'')+'</div>'+
+      '<div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem">'+
+        '<button class="btn btn-p" onclick="formImport()">Import Pukal (paste dari Excel)</button>'+
+        '<button class="btn btn-o" onclick="formPeserta()">+ Tambah Seorang</button>'+
+      '</div></div>'+
+      '<div class="card">'+(rows?'<div class="scroll"><table class="t"><thead><tr><th>No.</th><th>Nama</th><th>Tajuk Projek</th><th class="center">Hari</th><th class="center">Bil. Juri Nilai</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+        : '<div class="alert i">Belum ada peserta. Guna Import Pukal untuk masukkan senarai dari Excel.</div>')+'</div>';
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card">'+pilihEvent()+'<div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+function formPeserta(id){
+  var p = { no:'', nama:'', tajuk:'', hari:1, aktif:true };
+  if (id) ST.peserta.forEach(function(x){ if (x.id===id) p = x; });
+  var ev = null; ST.events.forEach(function(e){ if (e.id===ST.evId) ev = e; });
+  var bilHari = ev ? ev.bilHari : 3;
+  var opt = '';
+  for (var h=1; h<=bilHari; h++) opt += '<option value="'+h+'"'+(Number(p.hari)===h?' selected':'')+'>Hari '+h+'</option>';
+  modal('<h3>'+(id?'Edit Peserta':'Tambah Peserta')+'</h3>'+
+    '<div class="row c2"><div><label class="f">No. Pembentang</label><input class="f" id="p-no" value="'+esc(p.no)+'" placeholder="PEMBENTANG 1"></div>'+
+    '<div><label class="f">Hari</label><select class="f" id="p-hari">'+opt+'</select></div></div>'+
+    '<div style="margin-bottom:1rem"><label class="f">Nama Peserta</label><input class="f" id="p-nama" value="'+esc(p.nama)+'"></div>'+
+    '<div style="margin-bottom:1rem"><label class="f">Tajuk Projek</label><textarea class="f" id="p-tajuk" rows="2">'+esc(p.tajuk)+'</textarea></div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="p-aktif"'+(p.aktif?' checked':'')+'> Aktif (dipaparkan kepada juri)</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanPeserta(\''+(id||'')+'\')">Simpan</button></div>');
+}
+
+function simpanPeserta(id){
+  var d = { id:id||null, eventId:ST.evId, no:$('p-no').value.trim(), nama:$('p-nama').value.trim(),
+            tajuk:$('p-tajuk').value.trim(), hari:$('p-hari').value, aktif:$('p-aktif').checked };
+  if (!d.nama){ toast('Nama peserta diperlukan.'); return; }
+  api('simpanPeserta', d).then(function(){ tutupModal(); toast('Peserta disimpan.'); panePeserta(); })
+    .catch(function(e){ toast(e.message); });
+}
+
+function formImport(){
+  var ev = null; ST.events.forEach(function(e){ if (e.id===ST.evId) ev = e; });
+  var bilHari = ev ? ev.bilHari : 3;
+  modal('<h3>Import Peserta Pukal</h3>'+
+    '<div class="alert i" style="line-height:1.6">Susun dalam Excel ikut <b>4 lajur ini</b>, kemudian copy dan paste ke dalam kotak di bawah:<br>'+
+    '<b>No. Pembentang</b> | <b>Nama</b> | <b>Tajuk Projek</b> | <b>Hari</b><br>'+
+    'Jangan masukkan baris header. Event ini ada <b>'+bilHari+' hari</b>, jadi lajur Hari kena bernilai 1 hingga '+bilHari+'.</div>'+
+    '<div style="margin-bottom:1rem"><label class="f">Tampal data di sini</label>'+
+    '<textarea class="f" id="i-data" rows="10" placeholder="PEMBENTANG 1&#9;Ali bin Abu&#9;Pengurusan Nurseri&#9;1&#10;PEMBENTANG 2&#9;Siti binti Ahmad&#9;Jem Melon&#9;1"></textarea></div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="i-ganti"> Ganti semua peserta sedia ada untuk event ini (markah mereka turut dipadam)</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-o" onclick="pratonImport()">Pratonton</button>'+
+    '<button class="btn btn-p" onclick="jalanImport()">Import</button></div>'+
+    '<div id="i-prat" style="margin-top:1rem"></div>');
+}
+
+function parseImport(){
+  var teks = $('i-data').value.replace(/\r/g,'');
+  return teks.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l; })
+    .map(function(l){
+      var c = l.split('\t');
+      if (c.length < 2) c = l.split(/\s{2,}|\s*\|\s*|,(?=\S)/);
+      return { no:(c[0]||'').trim(), nama:(c[1]||'').trim(), tajuk:(c[2]||'').trim(), hari:(c[3]||'').trim() };
+    });
+}
+
+function pratonImport(){
+  var rows = parseImport();
+  if (!rows.length){ $('i-prat').innerHTML = '<div class="alert e">Tiada data dikesan.</div>'; return; }
+  $('i-prat').innerHTML = '<div class="muted" style="margin-bottom:.4rem">'+rows.length+' baris dikesan:</div>'+
+    '<div class="scroll" style="max-height:220px"><table class="t"><thead><tr><th>No.</th><th>Nama</th><th>Tajuk</th><th>Hari</th></tr></thead><tbody>'+
+    rows.map(function(r){
+      var ok = r.nama && r.hari;
+      return '<tr'+(ok?'':' style="background:#fee2e2"')+'><td>'+esc(r.no)+'</td><td>'+esc(r.nama)+'</td><td>'+esc(r.tajuk)+'</td><td>'+esc(r.hari)+'</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+function jalanImport(){
+  var rows = parseImport();
+  if (!rows.length){ toast('Tiada data untuk diimport.'); return; }
+  var ganti = $('i-ganti').checked;
+  var teruskan = function(){
+    api('importPeserta', { eventId:ST.evId, rows:rows, gantiSemua:ganti }).then(function(r){
+      tutupModal();
+      maklum(r.ralat.length ? 'Import Selesai Sebahagian' : 'Import Berjaya',
+        '<b>'+r.berjaya+'</b> peserta berjaya dimasukkan.' +
+        (r.ralat.length ? '<br><br><b>'+r.ralat.length+' baris gagal:</b><div class="muted" style="text-align:left;margin-top:.5rem;line-height:1.5">'+r.ralat.map(esc).join('<br>')+'</div>' : ''),
+        r.ralat.length ? 'e' : 's');
+      panePeserta();
+    }).catch(function(e){ toast(e.message); });
+  };
+  if (ganti) tanya('Pengesahan', 'Semua peserta sedia ada untuk event ini akan <b>dipadam</b> bersama markah mereka, dan diganti dengan '+rows.length+' baris baru. Teruskan?', 'Ya, Ganti Semua', teruskan, true);
+  else teruskan();
+}
+
+function resetPeserta(id, nama){
+  tanya('Reset Markah', 'Padam <b>semua markah daripada semua juri</b> untuk '+esc(nama)+'? Peserta kekal dalam senarai.', 'Ya, Reset', function(){
+    api('resetMarkahPeserta', { id:id }).then(function(r){ toast(r.padam+' rekod markah dipadam.'); panePeserta(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+function padamPeserta(id, nama){
+  tanya('Padam Peserta', 'Padam <b>'+esc(nama)+'</b> beserta semua markahnya? Tindakan ini tidak boleh dibatalkan.', 'Ya, Padam', function(){
+    api('padamPeserta', { id:id }).then(function(){ toast('Peserta dipadam.'); panePeserta(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+
+/* ---------- JURI ---------- */
+function paneJuri(){
+  if (!ST.evId){ $('panes').innerHTML = '<div class="card"><div class="alert i">Cipta event dahulu.</div></div>'; return; }
+  api('senaraiJuri', { eventId: ST.evId }).then(function(list){
+    ST.juri = list;
+    var ev = null; ST.events.forEach(function(e){ if (e.id===ST.evId) ev = e; });
+    var rows = list.map(function(j){
+      return '<tr><td><b>'+esc(j.nama)+'</b><div class="muted">'+esc(j.id)+'</div></td>'+
+        '<td class="nowrap"><code>'+esc(j.kod)+'</code></td>'+
+        '<td><span class="pill '+(j.terlibat?'ok':'bad')+'">'+(j.terlibat?'Terlibat':'Tidak')+'</span></td>'+
+        '<td class="nowrap">'+esc(j.hari)+'</td>'+
+        '<td class="center">'+j.bilNilai+'</td>'+
+        '<td><span class="pill '+(j.aktif?'ok':'bad')+'">'+(j.aktif?'Aktif':'Nyahaktif')+'</span></td>'+
+        '<td class="nowrap">'+
+          '<button class="btn btn-sm btn-p" onclick="formTugas(\''+j.id+'\')">Tugasan</button> '+
+          '<button class="btn btn-sm btn-o" onclick="formJuri(\''+j.id+'\')">Edit</button> '+
+          '<button class="btn btn-sm btn-s" onclick="kodBaru(\''+j.id+'\')">Kod Baru</button> '+
+          '<button class="btn btn-sm btn-d" onclick="padamJuri(\''+j.id+'\',\''+esc(j.nama).replace(/'/g,"\\'")+'\')">Padam</button>'+
+        '</td></tr>';
+    }).join('');
+    $('panes').innerHTML = '<div class="card">'+pilihEvent()+
+      '<div class="alert i" style="line-height:1.6">Senarai juri dikongsi merentas semua event. Guna butang <b>Tugasan</b> untuk tetapkan sama ada juri terlibat dalam event terpilih dan hari mana.<br>Lajur hari: <b>SEMUA</b> bermaksud semua hari. Untuk hari tertentu, tulis contohnya <b>1,3</b>.</div>'+
+      '<button class="btn btn-p" onclick="formJuri()">+ Tambah Juri</button></div>'+
+      '<div class="card"><h3 class="sec">Juri untuk '+(ev?esc(ev.nama):'')+'</h3>'+
+      (rows?'<div class="scroll"><table class="t"><thead><tr><th>Nama</th><th>Kod Akses</th><th>Event Ini</th><th>Hari</th><th class="center">Peserta Dinilai</th><th>Status Akaun</th><th>Tindakan</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+        :'<div class="alert i">Belum ada juri.</div>')+'</div>';
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card">'+pilihEvent()+'<div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+function formJuri(id){
+  var j = { nama:'', kod:'', aktif:true };
+  if (id) ST.juri.forEach(function(x){ if (x.id===id) j = x; });
+  modal('<h3>'+(id?'Edit Juri':'Tambah Juri')+'</h3>'+
+    '<div style="margin-bottom:1rem"><label class="f">Nama Penuh</label><input class="f" id="j-nama" value="'+esc(j.nama)+'" placeholder="PUAN ... / ENCIK ..."></div>'+
+    (id?'<div style="margin-bottom:1rem"><label class="f">Kod Akses</label><input class="f" id="j-kod" value="'+esc(j.kod)+'"></div>':'<p class="muted">Kod akses akan dijana secara automatik.</p>')+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="j-aktif"'+(j.aktif?' checked':'')+'> Akaun aktif (boleh log masuk)</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanJuri(\''+(id||'')+'\')">Simpan</button></div>');
+}
+
+function simpanJuri(id){
+  var d = { id:id||null, nama:$('j-nama').value.trim(), aktif:$('j-aktif').checked };
+  if ($('j-kod')) d.kod = $('j-kod').value.trim();
+  if (!d.nama){ toast('Nama juri diperlukan.'); return; }
+  api('simpanJuri', d).then(function(r){
+    tutupModal();
+    if (r.kod) maklum('Juri Ditambah', 'ID: <b>'+esc(r.id)+'</b><br>Kod Akses: <b>'+esc(r.kod)+'</b><br><br>Beri maklumat ini kepada juri. Jangan lupa tetapkan Tugasan untuk event.');
+    else toast('Juri disimpan.');
+    paneJuri();
+  }).catch(function(e){ toast(e.message); });
+}
+
+function formTugas(id){
+  var j = null; ST.juri.forEach(function(x){ if (x.id===id) j = x; });
+  var ev = null; ST.events.forEach(function(e){ if (e.id===ST.evId) ev = e; });
+  modal('<h3>Tugasan Juri</h3>'+
+    '<p class="muted">'+esc(j.nama)+'<br>Event: <b>'+esc(ev?ev.nama:'')+'</b> ('+(ev?ev.bilHari:'?')+' hari)</p>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.95rem;margin:1rem 0"><input type="checkbox" id="t-ada"'+(j.terlibat?' checked':'')+'> Juri ini terlibat dalam event terpilih</label>'+
+    '<div><label class="f">Hari yang ditugaskan</label><input class="f" id="t-hari" value="'+esc(j.hari||'SEMUA')+'" placeholder="SEMUA atau 1,3"></div>'+
+    '<p class="muted">Tulis <b>SEMUA</b> untuk semua hari, atau nombor hari dipisah koma seperti <b>1,3</b>. Juri hanya nampak peserta pada hari yang ditugaskan.</p>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanTugas(\''+id+'\')">Simpan</button></div>');
+}
+
+function simpanTugas(id){
+  api('tugaskanJuri', { eventId:ST.evId, juriId:id, hari:$('t-hari').value.trim(), terlibat:$('t-ada').checked })
+    .then(function(){ tutupModal(); toast('Tugasan disimpan.'); paneJuri(); })
+    .catch(function(e){ toast(e.message); });
+}
+
+function kodBaru(id){
+  tanya('Jana Kod Baru', 'Kod akses lama akan terus tidak sah. Teruskan?', 'Ya, Jana', function(){
+    api('janaKodJuri', { id:id }).then(function(r){
+      maklum('Kod Baru', 'Kod akses baru: <b>'+esc(r.kod)+'</b><br><br>Beritahu juri berkenaan.');
+      paneJuri();
+    }).catch(function(e){ toast(e.message); });
+  });
+}
+
+function padamJuri(id, nama){
+  tanya('Padam Juri', 'Padam <b>'+esc(nama)+'</b> beserta semua markah yang beliau berikan dalam semua event? Tindakan ini tidak boleh dibatalkan.', 'Ya, Padam', function(){
+    api('padamJuri', { id:id }).then(function(r){ toast('Juri dipadam ('+r.markahPadam+' rekod markah).'); paneJuri(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+
+/* ---------- STRUKTUR (anugerah + kriteria) ---------- */
+function paneStruktur(){
+  if (!ST.evId){ $('panes').innerHTML = '<div class="card"><div class="alert i">Cipta event dahulu.</div></div>'; return; }
+  api('strukturPenuh', { eventId: ST.evId }).then(function(d){
+    ST.struktur = d;
+    var html = '<div class="card">'+pilihEvent()+
+      '<div class="alert i" style="line-height:1.6">Setiap anugerah mengandungi beberapa kriteria. Markah maksimum ditetapkan per kriteria, jadi jumlah markah satu anugerah dikira automatik.<br><b>Berhati-hati:</b> memadam kriteria juga memadam markah yang sudah dihantar untuk kriteria itu.</div>'+
+      '<button class="btn btn-p" onclick="formAnugerah()">+ Tambah Anugerah</button></div>';
+
+    if (!d.anugerah.length) html += '<div class="card"><div class="alert i">Belum ada anugerah untuk event ini.</div></div>';
+
+    d.anugerah.forEach(function(a){
+      var maks = a.kriteria.filter(function(k){return k.aktif;}).reduce(function(t,k){ return t+k.maks; },0);
+      html += '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">'+
+        '<div><h3 class="sec" style="margin:0">'+esc(a.nama)+' '+(a.aktif?'':'<span class="pill bad">Nyahaktif</span>')+'</h3>'+
+        '<div class="muted">'+esc(a.id)+' · susunan '+a.susunan+' · '+a.kriteria.length+' kriteria · jumlah markah '+maks+'</div></div>'+
+        '<div class="nowrap"><button class="btn btn-sm btn-p" onclick="formKriteria(\''+a.id+'\')">+ Kriteria</button> '+
+        '<button class="btn btn-sm btn-o" onclick="formAnugerah(\''+a.id+'\')">Edit</button> '+
+        '<button class="btn btn-sm btn-d" onclick="padamAnugerah(\''+a.id+'\',\''+esc(a.nama).replace(/'/g,"\\'")+'\')">Padam</button></div></div>';
+      if (a.kriteria.length){
+        html += '<div class="scroll" style="max-height:none"><table class="t"><thead><tr><th class="center">#</th><th>Kriteria</th><th>Nota Bantuan</th><th class="center">Markah Maks</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>'+
+          a.kriteria.map(function(k){
+            return '<tr><td class="center">'+k.susunan+'</td><td>'+esc(k.teks)+'<div class="muted">'+esc(k.id)+'</div></td>'+
+              '<td class="muted">'+esc(k.tooltip||'—')+'</td><td class="center"><b>'+k.maks+'</b></td>'+
+              '<td><span class="pill '+(k.aktif?'ok':'bad')+'">'+(k.aktif?'Aktif':'Tidak')+'</span></td>'+
+              '<td class="nowrap"><button class="btn btn-sm btn-o" onclick="formKriteria(\''+a.id+'\',\''+k.id+'\')">Edit</button> '+
+              '<button class="btn btn-sm btn-d" onclick="padamKriteria(\''+k.id+'\')">Padam</button></td></tr>';
+          }).join('')+'</tbody></table></div>';
+      } else {
+        html += '<div class="muted">Belum ada kriteria.</div>';
+      }
+      html += '</div>';
+    });
+    $('panes').innerHTML = html;
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card">'+pilihEvent()+'<div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+function formAnugerah(id){
+  var a = { nama:'', susunan:(ST.struktur.anugerah.length+1), aktif:true };
+  if (id) ST.struktur.anugerah.forEach(function(x){ if (x.id===id) a = x; });
+  modal('<h3>'+(id?'Edit Anugerah':'Tambah Anugerah')+'</h3>'+
+    '<div class="row c2"><div><label class="f">Nama Anugerah</label><input class="f" id="a-nama" value="'+esc(a.nama)+'" placeholder="Pembentang Terbaik"></div>'+
+    '<div><label class="f">Susunan</label><input class="f" id="a-sus" type="number" min="1" value="'+a.susunan+'"></div></div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="a-aktif"'+(a.aktif?' checked':'')+'> Aktif</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanAnugerah(\''+(id||'')+'\')">Simpan</button></div>');
+}
+function simpanAnugerah(id){
+  var d = { id:id||null, eventId:ST.evId, nama:$('a-nama').value.trim(), susunan:$('a-sus').value, aktif:$('a-aktif').checked };
+  if (!d.nama){ toast('Nama anugerah diperlukan.'); return; }
+  api('simpanAnugerah', d).then(function(){ tutupModal(); toast('Anugerah disimpan.'); paneStruktur(); })
+    .catch(function(e){ toast(e.message); });
+}
+function padamAnugerah(id, nama){
+  tanya('Padam Anugerah', 'Padam <b>'+esc(nama)+'</b> beserta semua kriteria dan markahnya? Tindakan ini tidak boleh dibatalkan.', 'Ya, Padam', function(){
+    api('padamAnugerah', { id:id }).then(function(){ toast('Anugerah dipadam.'); paneStruktur(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+
+function formKriteria(angId, id){
+  var ang = null; ST.struktur.anugerah.forEach(function(x){ if (x.id===angId) ang = x; });
+  var k = { teks:'', tooltip:'', maks:10, susunan:(ang.kriteria.length+1), aktif:true };
+  if (id) ang.kriteria.forEach(function(x){ if (x.id===id) k = x; });
+  modal('<h3>'+(id?'Edit Kriteria':'Tambah Kriteria')+'</h3>'+
+    '<p class="muted">Anugerah: <b>'+esc(ang.nama)+'</b></p>'+
+    '<div style="margin:1rem 0"><label class="f">Teks Kriteria</label><textarea class="f" id="k-teks" rows="2">'+esc(k.teks)+'</textarea></div>'+
+    '<div style="margin-bottom:1rem"><label class="f">Nota Bantuan (pilihan, dipaparkan di bawah kriteria)</label><textarea class="f" id="k-tip" rows="2">'+esc(k.tooltip||'')+'</textarea></div>'+
+    '<div class="row c2"><div><label class="f">Markah Maksimum</label><input class="f" id="k-maks" type="number" min="1" max="100" value="'+k.maks+'"></div>'+
+    '<div><label class="f">Susunan</label><input class="f" id="k-sus" type="number" min="1" value="'+k.susunan+'"></div></div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="k-aktif"'+(k.aktif?' checked':'')+'> Aktif</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanKriteria(\''+angId+'\',\''+(id||'')+'\')">Simpan</button></div>');
+}
+function simpanKriteria(angId, id){
+  var d = { id:id||null, eventId:ST.evId, anugerahId:angId, teks:$('k-teks').value.trim(),
+            tooltip:$('k-tip').value.trim(), maks:$('k-maks').value, susunan:$('k-sus').value, aktif:$('k-aktif').checked };
+  if (!d.teks){ toast('Teks kriteria diperlukan.'); return; }
+  api('simpanKriteria', d).then(function(){ tutupModal(); toast('Kriteria disimpan.'); paneStruktur(); })
+    .catch(function(e){ toast(e.message); });
+}
+function padamKriteria(id){
+  tanya('Padam Kriteria', 'Padam kriteria ini beserta semua markah yang sudah dihantar untuknya?', 'Ya, Padam', function(){
+    api('padamKriteria', { id:id }).then(function(r){ toast('Kriteria dipadam ('+r.markahPadam+' markah).'); paneStruktur(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+
+/* ---------- AKAUN ADMIN ---------- */
+function paneAkaun(){
+  api('senaraiAdmin', {}).then(function(list){
+    ST.admin = list;
+    var rows = list.map(function(a){
+      return '<tr><td><b>'+esc(a.nama)+'</b><div class="muted">'+esc(a.id)+'</div></td>'+
+        '<td class="nowrap"><code>'+esc(a.kod)+'</code></td>'+
+        '<td><span class="pill '+(a.role==='superadmin'?'warn':'info')+'">'+esc(a.role)+'</span></td>'+
+        '<td><span class="pill '+(a.aktif?'ok':'bad')+'">'+(a.aktif?'Aktif':'Nyahaktif')+'</span></td>'+
+        '<td class="nowrap"><button class="btn btn-sm btn-o" onclick="formAdmin(\''+a.id+'\')">Edit</button> '+
+        '<button class="btn btn-sm btn-d" onclick="padamAdmin(\''+a.id+'\',\''+esc(a.nama).replace(/'/g,"\\'")+'\')">Padam</button></td></tr>';
+    }).join('');
+    $('panes').innerHTML = '<div class="card"><h3 class="sec">Akaun Admin</h3>'+
+      '<div class="alert i" style="line-height:1.6"><b>admin</b> hanya boleh lihat Ranking dan Progres. <b>superadmin</b> boleh ubah semua konfigurasi.<br>'+
+      'Akaun superadmin utama anda disimpan dalam Script Properties Apps Script, bukan dalam senarai ini. Untuk tukar kod aksesnya, buka Apps Script > Project Settings > Script Properties > SUPERADMIN_PASS.</div>'+
+      '<button class="btn btn-p" onclick="formAdmin()">+ Tambah Akaun</button></div>'+
+      '<div class="card">'+(rows?'<div class="scroll"><table class="t"><thead><tr><th>Nama</th><th>Kod Akses</th><th>Role</th><th>Status</th><th>Tindakan</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="alert i">Tiada akaun admin.</div>')+'</div>';
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card"><div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+function formAdmin(id){
+  var a = { nama:'', kod:'', role:'admin', aktif:true };
+  if (id) ST.admin.forEach(function(x){ if (x.id===id) a = x; });
+  modal('<h3>'+(id?'Edit Akaun':'Tambah Akaun')+'</h3>'+
+    '<div style="margin-bottom:1rem"><label class="f">Nama</label><input class="f" id="ad-nama" value="'+esc(a.nama)+'"></div>'+
+    '<div class="row c2"><div><label class="f">Role</label><select class="f" id="ad-role">'+
+      '<option value="admin"'+(a.role==='admin'?' selected':'')+'>admin (lihat sahaja)</option>'+
+      '<option value="superadmin"'+(a.role==='superadmin'?' selected':'')+'>superadmin (penuh)</option></select></div>'+
+    (id?'<div><label class="f">Kod Akses</label><input class="f" id="ad-kod" value="'+esc(a.kod)+'"></div>':'<div><label class="f">Kod Akses</label><input class="f" id="ad-kod" placeholder="Biarkan kosong untuk jana automatik"></div>')+
+    '</div>'+
+    '<label style="display:flex;gap:.5rem;align-items:center;font-size:.9rem"><input type="checkbox" id="ad-aktif"'+(a.aktif?' checked':'')+'> Aktif</label>'+
+    '<div class="mact"><button class="btn btn-s" onclick="tutupModal()">Batal</button>'+
+    '<button class="btn btn-p" onclick="simpanAdmin(\''+(id||'')+'\')">Simpan</button></div>');
+}
+function simpanAdmin(id){
+  var d = { id:id||null, nama:$('ad-nama').value.trim(), kod:$('ad-kod').value.trim(),
+            role:$('ad-role').value, aktif:$('ad-aktif').checked };
+  if (!d.nama){ toast('Nama diperlukan.'); return; }
+  api('simpanAdmin', d).then(function(r){
+    tutupModal();
+    if (r.kod) maklum('Akaun Ditambah', 'ID: <b>'+esc(r.id)+'</b><br>Kod Akses: <b>'+esc(r.kod)+'</b>');
+    else toast('Akaun disimpan.');
+    paneAkaun();
+  }).catch(function(e){ toast(e.message); });
+}
+function padamAdmin(id, nama){
+  tanya('Padam Akaun', 'Padam akaun <b>'+esc(nama)+'</b>?', 'Ya, Padam', function(){
+    api('padamAdmin', { id:id }).then(function(){ toast('Akaun dipadam.'); paneAkaun(); })
+      .catch(function(e){ toast(e.message); });
+  }, true);
+}
+
+/* ---------- AUDIT ---------- */
+function paneAudit(){
+  api('auditLog', { had:300 }).then(function(list){
+    var rows = list.map(function(r){
+      var t = r.masa;
+      try { t = new Date(r.masa).toLocaleString('ms-MY', { timeZone:'Asia/Kuala_Lumpur' }); } catch(e){}
+      return '<tr><td class="nowrap muted">'+esc(t)+'</td><td>'+esc(r.nama)+'<div class="muted">'+esc(r.actor)+' · '+esc(r.role)+'</div></td>'+
+        '<td class="nowrap"><span class="pill info">'+esc(r.action)+'</span></td><td class="muted">'+esc(r.detail)+'</td></tr>';
+    }).join('');
+    $('panes').innerHTML = '<div class="card"><h3 class="sec">Audit Log</h3>'+
+      '<div class="muted">300 rekod terkini, terbaru di atas.</div></div>'+
+      '<div class="card">'+(rows?'<div class="scroll"><table class="t"><thead><tr><th>Masa</th><th>Pengguna</th><th>Tindakan</th><th>Butiran</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="alert i">Tiada rekod.</div>')+'</div>';
+  }).catch(function(e){ $('panes').innerHTML = '<div class="card"><div class="alert e">'+esc(e.message)+'</div></div>'; });
+}
+
+/* ===========================================================================
+   MULA
+   =========================================================================== */
+(function init(){
+  if (!url()){ tunjuk('setup'); return; }
+  var t = localStorage.getItem('juri_token');
+  if (!t){ tunjuk('login'); muatBranding(); return; }
+  S.token = t;
+  spin(true);
+  api('semakSesi', {}, true).then(function(s){
+    spin(false);
+    S = { token:t, nama:s.nama, role:s.role, userId:s.userId };
+    mulaApp();
+  }).catch(function(){
+    spin(false);
+    bersihSesi();
+    tunjuk('login');
+    muatBranding();
+  });
+})();
+</script>
+</body>
+</html>
